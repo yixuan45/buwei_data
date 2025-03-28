@@ -13,8 +13,11 @@ daima_list = []
 name_list = []
 quyu_list = []
 zhixiashi = ['北京市', '天津市', '上海市', '重庆市']
+<<<<<<< HEAD
 shujuyuan_name = []  # 用于存储生成的数据源编码规则名字
 shujuyuan_code = []  # 用于存储生成的数据源编码规则代码
+=======
+>>>>>>> 73b7e45dc941b763fc044da2eac539ff307615ce
 qu_dict_li = []  # 用来存储区名整理成字典的列表
 li = [2, 3, 4, 5, 6, 7, 8, 9, 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
       'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
@@ -104,6 +107,8 @@ for index_sheng in range(2, 42):  # 先遍历省级数据，再遍历部门代�
             save_data_shiji(index_bumen, index_shiji)  # 如果不是以上的一种情况
             shujuyuan_code.append(df_shiji.iloc[index_shiji - 2, 0])
             shujuyuan_name.append(df_shiji.iloc[index_shiji - 2, 1])
+                continue
+            save_data_shiji(index_bumen, index_shiji)  # 如果不是以上的一种情况
             quyu_list.append('市级')
             # 如果没有执行if语句就说明，这个数据不是直辖市就要去找区级数据
             if sheng_name in zhixiashi:  # 如果是直辖市数据,就不用把sheng_name去掉
@@ -124,7 +129,10 @@ for index_sheng in range(2, 42):  # 先遍历省级数据，再遍历部门代�
                     daima_list.append(shiji_code)
                     name_list.append(shiji_name)
                     quyu_list.append('区级')
-
+                    shiji_name = shiji_name + data + df_bumendaima.iloc[index_bumen - 2, 1]
+                    daima_list.append(shiji_code)
+                    name_list.append(shiji_name)
+                    quyu_list.append('区级')
             else:
                 judgment = df_shiji.iloc[index_shiji - 2, 1].replace(sheng_name, '')  # 把市哪些给去掉，只剩下一个区名
                 try:
@@ -150,7 +158,6 @@ for index_sheng in range(2, 42):  # 先遍历省级数据，再遍历部门代�
                 daima_list.append(shiji_code)
                 name_list.append(shiji_name)
                 quyu_list.append('区级')
-
                 qu_judgment += 1
 
 data_dict = {
@@ -190,3 +197,34 @@ print('存储完毕')
 #         df.to_excel('./总数据.xlsx', sheet_name=sheng_name)
 #     print(f'{sheng_name}存储成功')
 # print("执行完毕")
+
+data_dict = {
+    'daima': [],
+    'name': [],
+    'quyu': []
+}
+
+# Excel 文件路径
+file_path = '总数据.xlsx'
+for index_sheng in range(2, 42):
+    data_dict = {
+        'daima': [],
+        'name': [],
+        'quyu': []
+    }
+    sheng_name = df_shengji.iloc[index_sheng - 2, 1]  # 前面的名字
+    for index, name in enumerate(name_list):
+        if df_shengji.iloc[index_sheng - 2, 1] in name:
+            data_dict['daima'].append(daima_list[index])
+            data_dict['name'].append(name)
+            data_dict['quyu'].append(quyu_list[index])
+    if index_sheng > 2:
+        with pd.ExcelWriter(file_path, engine='openpyxl', mode='a') as writer:
+            df = pd.DataFrame(data_dict)
+            df.to_excel(writer, sheet_name=sheng_name, index=False)
+    else:
+        df = pd.DataFrame(data_dict)
+        df.to_excel('./总数据.xlsx', sheet_name=sheng_name)
+    print(f'{sheng_name}存储成功')
+print("执行完毕")
+
